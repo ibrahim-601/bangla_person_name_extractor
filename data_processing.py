@@ -1,43 +1,66 @@
 import os
-import requests
+import json
+from utils.downloader import download_data 
+from utils.tokenizer import BasicTokenizer
 
-def download_data():
-    """This function downloads dataset using the links provided in the test description.
+tokenizer = BasicTokenizer()
+
+def remove_unwanted_tags(tags: list) -> list:
+    """Removed tags which are not required for this project.
+
+    Args:
+        tags (list): list of tags
+
+    Returns:
+        list: list of tags after removing not required tags
     """
-    # create data folders
-    os.makedirs("data", exist_ok=True)
-    # url for data_1 (https://github.com/Rifat1493/Bengali-NER/tree/master/annotated%20data)
-    url_1 = 'https://raw.githubusercontent.com/Rifat1493/Bengali-NER/master/annotated%20data/'
-    # create an empty file
-    data_path = "data/data_1_raw.txt"
-    open(data_path, "w")
-    # there is total 20 text file in the repository, we will download all of them using loop
-    for i in range(1,21):
-        # if i!=1:
-        #     continue
-        # create url for each file 
-        url = url_1 + str(i) + ".txt"
-        # get the data
-        res = requests.get(url)
-        # append the data to a text file
-        with open(data_path, "a", encoding="utf-8") as file:
-            # take the text from the web response and remove first character which is an extra character
-            text_data = res.text
-            file.write(text_data[1:])
-            # add a new line character as this dataset contains sentences seperated with new line
-            file.write("\n")
+    # initialize variable for updated tags
+    updated_tags = []
+    # iterate over each tag
+    for tag in tags:
+        # if tag does not contain "PER" then add "O" for that tag
+        if "per" not in tag.lower():
+            updated_tags.append("O")
+        # otherwise add the tag into updated tags
+        else:
+            updated_tags.append(tag)
+    # return the updated tags
+    return updated_tags
 
-    # url for data_2 (https://raw.githubusercontent.com/banglakit/bengali-ner-data/master/main.jsonl)
-    url_2 = 'https://raw.githubusercontent.com/banglakit/bengali-ner-data/master/main.jsonl'
-    # get the data
-    res = requests.get(url_2)
-    # write the data to a text file
-    data_path = "data/data_2_raw.jsonl"
-    with open(data_path, "w", encoding="utf-8") as file:
-        file.write(res.text)
-    # print a message after completion of downloading data
-    print("Successfully downloaded data.")
+def process_text_data(data_path: str, save_path: str) -> list:
+    processed_data = []
+    # read data from file
+    raw_data = open(data_path, encoding="utf8").read()
+    tagged_sentences = raw_data.split("\n\n")
+    for tagged_sentence in tagged_sentences:
+        if not tagged_sentence:
+            continue
+        tagged_sentence = tagged_sentence.strip()
+        tagged_sentence = tagged_sentence.strip("\n")
+        processed_dict = {
+                "tokens": [],
+                "tags": [],
+            }
+        tagged_words = tagged_sentence.split("\n")
+        for tagged_word in tagged_words:
+            if not tagged_word:
+                continue
+            tagged_word = tagged_word.replace("\t\t", "\t")
+            tagged_word = tagged_word.strip("\t")
+            word_tag_split = tagged_word.split("\t")
+            if len(word_tag_split)<2:
+                continue
+            processed_dict["tokens"].append(word_tag_split[0])
+            processed_dict["tags"].append(word_tag_split[1])
+        processed_dict["tags"] = remove_unwanted_tags(processed_dict["tags"])
+        processed_data.append(processed_dict)
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    with open(save_path, "w", encoding="utf-8") as f:
+        f.write(json.dumps(processed_data, ensure_ascii=False))
 
 if __name__ == "__main__":
-    # download the dataset provided for the project
-    download_data()
+    # download the dataset provided for the project if it does not exist
+    if not os.path.exists("./data_raw/data_1_raw.txt") or not os.path.exists("./data_raw/data_2_raw.jsonl"):
+        download_data("data_raw")
+    process_text_data("./data_raw/data_1_raw.txt", "./data_processed/data_1.json")
+
