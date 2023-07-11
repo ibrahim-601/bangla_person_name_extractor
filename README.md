@@ -18,8 +18,14 @@ Now we need to convert both the data into similar format. Data_1 is tokenized, b
 [
     {
         "tokens": ["ইব্রাহীম", "ভালো", "কোডিং", "পারে", "।"],
-        "tags": ["B-PERSON", "O", "O", "O", "O"],
+        "tags": ["B-PER", "O", "O", "O", "O"],
     },
 ]
 ```
-After this we will convert `IOB` notation into `BLIOU` notation and then we will remove all NER tags other than `Person` tags.
+N.B.: We found that some words in data_1 has no tag tag for it, so we will remove those tokens. Also some sentence have extra tags, we will remove those also. There are many more issues in the data i.e. there is a person name but it is tagged as `O`, same person name is tagged as `PERSON` in some sentence and tagged as `O` in other sentence, etc. We will ignore these as we have limited time for the submission.
+
+After this we will convert `IOB` notation into `BLIOU` notation and we will also remove all NER tags other than `Person` tags. We will changes all `x-PERSON` tag to `x-PER` tag for consistancy across data.
+
+N.B.: After removing other tags than `Person` we have some sentences with `Person` and some sentences with `O` tags only (which actually means no tag). To prevent skewness is data we will make train, test, validation sets from those two categories seperately.
+
+N.B.: The tokenizer we created from bert tokenizer treat all punctuations as token. Which leads to converting `মো.`, `ডা.`, `কো-অপারেটিভ` into `মো` and `.`, `ডা` and `.`, `কো` and `-` and `অপারেটিভ` respectivly. This results into inconsistency in token lengths and tag lengths. We will think of an way to resolve this.
