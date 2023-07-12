@@ -14,7 +14,7 @@
 # limitations under the License.
 """Tokenization classes."""
 
-# this script is modified from "https://github.com/google-research/bert/blob/master/tokenization.py"
+# this script is taken and modified from "https://github.com/google-research/bert/blob/master/tokenization.py"
 
 import unicodedata
 import six
@@ -52,14 +52,6 @@ class BasicTokenizer(object):
     """Tokenizes a piece of text."""
     text = convert_to_unicode(text)
     text = self._clean_text(text)
-
-    # This was added on November 1st, 2018 for the multilingual and Chinese
-    # models. This is also applied to the English models now, but it doesn't
-    # matter since the English models were not trained on any Chinese data
-    # and generally don't have any Chinese data in them (there are Chinese
-    # characters in the vocabulary because Wikipedia does have some Chinese
-    # words in the English Wikipedia.).
-
     orig_tokens = whitespace_tokenize(text)
     split_tokens = []
     for token in orig_tokens:
@@ -130,6 +122,10 @@ def _is_punctuation(char):
   # Characters such as "^", "$", and "`" are not in the Unicode
   # Punctuation class but we treat them as punctuation anyways, for
   # consistency.
+
+  # do not consider "." as a seperate token.
+  if cp==46:
+    return False
   if ((cp >= 33 and cp <= 47) or (cp >= 58 and cp <= 64) or
       (cp >= 91 and cp <= 96) or (cp >= 123 and cp <= 126)):
     return True

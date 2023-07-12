@@ -7,7 +7,7 @@ We got two datasets.
 1. [Rifat1493/Bengali-NER/annotated data](https://github.com/Rifat1493/Bengali-NER/tree/master/annotated%20data) (data_1), and
 2. [banglakit/bengali-ner-data](https://raw.githubusercontent.com/banglakit/bengali-ner-data/master/main.jsonl) (data_2)
 
-After looking through the data it is found that data_1 is in `IOB` notation and data_2 is in `BLIOU` notation. So, we need to process the data to be in similar notation. We will use `BLIOU` notation for our project as initial plan is to use `spacy`.
+After looking through the data it is found that data_1 is in `IOB` notation and data_2 is in `BILUO` notation. So, we need to process the data to be in similar notation. We will use `BILUO` notation for our project as initial plan is to use `spacy`.
 
 ## Preprocessing
 ### Step 1:
@@ -22,10 +22,10 @@ Now we need to convert both the data into similar format. Data_1 is tokenized, b
     },
 ]
 ```
-N.B.: We found that some words in data_1 has no tag tag for it, so we will remove those tokens. Also some sentence have extra tags, we will remove those also. There are many more issues in the data i.e. there is a person name but it is tagged as `O`, same person name is tagged as `PERSON` in some sentence and tagged as `O` in other sentence, etc. We will ignore these as we have limited time for the submission.
+N.B. (1): We found that some words in data_1 has no tag tag for it, so we will remove those tokens. Also some sentence have extra tags, we will remove those also. There are many more issues in the data i.e. there is a person name but it is tagged as `O`, same person name is tagged as `PERSON` in some sentence and tagged as `O` in other sentence, etc. We will ignore these as we have limited time for the submission.
 
-After this we will convert `IOB` notation into `BLIOU` notation and we will also remove all NER tags other than `Person` tags. We will changes all `x-PERSON` tag to `x-PER` tag for consistancy across data.
+After this we will convert `IOB` notation into `BILUO` notation and we will also remove all NER tags other than `Person` tags. We will changes all `x-PERSON` tag to `x-PER` tag for consistancy across data.
 
-N.B.: After removing other tags than `Person` we have some sentences with `Person` and some sentences with `O` tags only (which actually means no tag). To prevent skewness is data we will make train, test, validation sets from those two categories seperately.
+N.B. (2): After removing other tags than `Person` we have some sentences with `Person` and some sentences with `O` tags only (which actually means no tag). To prevent skewness is data we will make train, test, validation sets from those two categories seperately.
 
-N.B.: The tokenizer we created from bert tokenizer treat all punctuations as token. Which leads to converting `মো.`, `ডা.`, `কো-অপারেটিভ` into `মো` and `.`, `ডা` and `.`, `কো` and `-` and `অপারেটিভ` respectivly. This results into inconsistency in token lengths and tag lengths. We will think of an way to resolve this.
+N.B. (3): The tokenizer we created from bert tokenizer treat all punctuations as token. Which leads to converting `মো.` --> `মো` and `.`, `ডা.` --> `ডা` and `.`, `৯.৭` --> `৯` and `.` and `৭`, `কো-অপারেটিভ` --> `কো` and `-` and `অপারেটিভ`, etc. This results into inconsistency in token lengths and tag lengths. We will modify the tokenizer to not tokenize on `.` character. But data_1 has `.` as a seperate token and `-` not seperated i.e. `মো.` --> `মো` and `.`, and `কো-অপারেটিভ` --> `কো-অপারেটিভ`. We will modify the processing steps for data_1 so that these cases match on both datasets. We will merge `মো` and `.` --> `মো.`, and split `কো-অপারেটিভ` --> `কো` and `-` and `অপারেটিভ`. We will also modify the tags accordingly.
