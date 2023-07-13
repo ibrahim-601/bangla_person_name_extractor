@@ -29,3 +29,11 @@ After this we will convert `IOB` notation into `BILUO` notation and we will also
 N.B. (2): After removing other tags than `Person` we have some sentences with `Person` and some sentences with `O` tags only (which actually means no tag). To prevent skewness is data we will make train, test, validation sets from those two categories seperately.
 
 N.B. (3): The tokenizer we created from bert tokenizer treat all punctuations as token. Which leads to converting `মো.` --> `মো` and `.`, `ডা.` --> `ডা` and `.`, `৯.৭` --> `৯` and `.` and `৭`, `কো-অপারেটিভ` --> `কো` and `-` and `অপারেটিভ`, etc. This results into inconsistency in token lengths and tag lengths. We will modify the tokenizer to not tokenize on `.` character. But data_1 has `.` as a seperate token and `-` not seperated i.e. `মো.` --> `মো` and `.`, and `কো-অপারেটিভ` --> `কো-অপারেটিভ`. We will modify the processing steps for data_1 so that these cases match on both datasets. We will merge `মো` and `.` --> `মো.`, and split `কো-অপারেটিভ` --> `কো` and `-` and `অপারেটিভ`. We will also modify the tags accordingly.
+
+### Step 3:
+We will merge sentences containing `PERSON` tag from both dataset (data_1 data_2) and split them into train, validation, and test set in (80%,10%,10%) ratio respectively.
+We will merge sentences without `PERSON` tag from both dataset (data_1 data_2) and split them into train, validation, and test set in (80%,10%,10%) ratio respectively.
+Now, we will merge both train data (with and without `PERSON` tag) into one and convert them to spacy data format (spacy binary data). We will do the same for validation and test set also.
+
+## Model Training
+We will fine-tune (`BERT` model)[https://huggingface.co/csebuetnlp/banglabert] from (BUET CSE NLP group)[https://huggingface.co/csebuetnlp] using spacy. We chose to fine-tune this model because this model better test result claimed by (BUET CSE NLP group)[https://huggingface.co/csebuetnlp] and moderate numbers of parameters (110 M) to be trained on free cloud GPUs (colab or kaggle). 

@@ -18,7 +18,10 @@
 
 import unicodedata
 import six
+from config import config as cfg
 
+# get punctuation to skip from config file
+SKIP_PUNC = cfg.SKIP_PUNC
 
 def convert_to_unicode(text):
   """Converts `text` to Unicode (if it's not already), assuming utf-8 input."""
@@ -117,15 +120,18 @@ def _is_control(char):
 
 def _is_punctuation(char):
   """Checks whether `chars` is a punctuation character."""
+
+  # if character in SKIP_PUNC list then we want them
+  # not to tokenize seperately so we will return False.
+  if char in SKIP_PUNC:
+    return False
+  # continue as it is
   cp = ord(char)
   # We treat all non-letter/number ASCII as punctuation.
   # Characters such as "^", "$", and "`" are not in the Unicode
   # Punctuation class but we treat them as punctuation anyways, for
   # consistency.
 
-  # do not consider "." as a seperate token.
-  if cp==46:
-    return False
   if ((cp >= 33 and cp <= 47) or (cp >= 58 and cp <= 64) or
       (cp >= 91 and cp <= 96) or (cp >= 123 and cp <= 126)):
     return True

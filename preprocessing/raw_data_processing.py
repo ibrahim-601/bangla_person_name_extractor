@@ -4,8 +4,10 @@ import json
 from spacy.training.iob_utils import iob_to_biluo
 from utils.downloader import download_data 
 from utils.tokenizer import BasicTokenizer
+from config import config as cfg
 
 tokenizer = BasicTokenizer()
+
 def write_json(json_data: json, json_save_path: str):
     """This function saves json data to given path.
 
@@ -305,9 +307,30 @@ def process_jsonl_data(data_path: str, print_summary: bool = True, save_path: st
 
 if __name__ == "__main__":
     # download the dataset provided for the project if it does not exist
-    if not os.path.exists("./data_raw/data_1_raw.txt") or not os.path.exists("./data_raw/data_2_raw.jsonl"):
-        download_data("data_raw")
+    data_path_1 = os.path.join(cfg.RAW_DATA_DOWNLOAD_DIR, cfg.RAW_DATA_1_FILE_NAME)
+    data_path_2 = os.path.join(cfg.RAW_DATA_DOWNLOAD_DIR, cfg.RAW_DATA_2_FILE_NAME)
+    if not os.path.exists(data_path_1) or not os.path.exists(data_path_2):
+        download_data()
     # process text data (data_1)
-    data_1 = process_text_data(data_path="./data_raw/data_1_raw.txt", save_path="./data_processed/data_1.json")
+    save_data_path = os.path.join(cfg.PROCESSESED_DATA_SAVE_DIR, cfg.PROCESSESED_DATA_1_NAME)
+    data_1 = process_text_data(data_path=data_path_1, save_path=save_data_path)
     # process jsonl data (data_2)
-    data_2 = process_jsonl_data(data_path="./data_raw/data_2_raw.jsonl", save_path="./data_processed/data_2.json")
+    save_data_path = os.path.join(cfg.PROCESSESED_DATA_SAVE_DIR, cfg.PROCESSESED_DATA_2_NAME)
+    data_2 = process_jsonl_data(data_path=data_path_2, save_path=save_data_path)
+    # merge data containing person tag
+    all_person_data = data_1["person"] + data_2["person"]
+    # merge data containing no person tag
+    all_no_person_data = data_1["no_person"] + data_2["no_person"]
+    all_data = all_person_data + all_no_person_data
+    from preprocessing.train_data_processing import convert_spacy_binary, split_data
+    train_person, valid_person, test_person = split_data(all_person_data)
+    train_no_person, valid_no_person, test_no_person = split_data(all_no_person_data)
+    train, valid, test = train_person+train_no_person, valid_person+valid_no_person, test_person+test_no_person
+    
+    write_json(test, json_save_path="dataset/final_test_data.json")
+    save_data_path = os.path.join(cfg.BINARY_DATA_DIR, cfg.TAIN_DATA_NAME)
+    convert_spacy_binary(train, save_data_path)
+    save_data_path = os.path.join(cfg.BINARY_DATA_DIR, cfg.VALID_DATA_NAME)
+    convert_spacy_binary(valid, save_data_path)
+    save_data_path = os.path.join(cfg.BINARY_DATA_DIR, cfg.TEST_DATA_NAME)
+    convert_spacy_binary(test, save_data_path)

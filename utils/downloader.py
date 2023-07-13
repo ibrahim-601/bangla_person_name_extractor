@@ -1,19 +1,19 @@
 import os
 import requests
+from config import config as cfg
 
-def download_data(save_dir: str):
+def download_data():
     """This function downloads dataset using the links provided in the test description.
 
     Args:
-        save_dir (str): directory to save data
 
     """
     # create data folders
-    os.makedirs(save_dir, exist_ok=True)
+    os.makedirs(cfg.RAW_DATA_DOWNLOAD_DIR, exist_ok=True)
     # url for data_1 (https://github.com/Rifat1493/Bengali-NER/tree/master/annotated%20data)
     url_1 = 'https://raw.githubusercontent.com/Rifat1493/Bengali-NER/master/annotated%20data/'
     # create an empty file
-    data_path_1 = os.path.join(save_dir, "data_1_raw.txt")
+    data_path_1 = os.path.join(cfg.RAW_DATA_DOWNLOAD_DIR, cfg.RAW_DATA_1_FILE_NAME)
     open(data_path_1, "w")
     # there is total 20 text file in the repository, we will download all of them using loop
     for i in range(1,21):
@@ -36,7 +36,7 @@ def download_data(save_dir: str):
     # get the data
     res = requests.get(url_2)
     # write the data to a text file
-    data_path_2 = os.path.join(save_dir, "data_2_raw.jsonl")
+    data_path_2 = os.path.join(cfg.RAW_DATA_DOWNLOAD_DIR, cfg.RAW_DATA_2_FILE_NAME)
     with open(data_path_2, "w", encoding="utf-8") as file:
         file.write(res.text)
     # print a message after completion of downloading data
