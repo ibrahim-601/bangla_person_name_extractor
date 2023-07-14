@@ -1,12 +1,10 @@
 import os
 import requests
+import gdown
 from config import config as cfg
 
 def download_data():
     """This function downloads dataset using the links provided in the test description.
-
-    Args:
-
     """
     # create data folders
     os.makedirs(cfg.RAW_DATA_DOWNLOAD_DIR, exist_ok=True)
@@ -41,3 +39,13 @@ def download_data():
         file.write(res.text)
     # print a message after completion of downloading data
     print("Successfully downloaded data.")
+
+def download_model():
+    """This function download model from google drive using the public url set in the config
+    """
+    model_url = cfg.MODEL_URL
+    model_save_dir = cfg.MODEL_DIR
+    gdown.download_folder(model_url, output=model_save_dir)
+
+if __name__ == "__main__":
+    download_model()

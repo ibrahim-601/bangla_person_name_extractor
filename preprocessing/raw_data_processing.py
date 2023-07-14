@@ -77,13 +77,14 @@ def _handle_dot_and_minus_text(tokens: list, tags: list) -> tuple:
     # return new tokens and new tags
     return (new_tokens, new_tags)
 
-def _print_data_processing_summary(processed_data: dict):
+def _print_data_processing_summary(processed_data: dict, data_name: str):
     """This function prints summary of data proccessing.
 
     Args:
         processed_data (dict): dictionary of processed data
+        data_name (str): Name of data set.
     """
-    print("\nData summary:")
+    print("\nData summary: ", data_name)
     print("-"*30)
     print(f"Total sentence : {len(processed_data['no_person']) + len(processed_data['person'])}")
     print(f"Sentence with person tag: {len(processed_data['person'])}")
@@ -220,7 +221,7 @@ def process_text_data(data_path: str, print_summary: bool = True, save_path: str
             processed_data["person"].append(processed_dict)
     # print summary if flag is on
     if print_summary:
-        _print_data_processing_summary(processed_data=processed_data)
+        _print_data_processing_summary(processed_data=processed_data, data_name="data_1")
     # save json if path is passed
     if save_path:
         write_json(json_data=processed_data, json_save_path=save_path)
@@ -298,7 +299,7 @@ def process_jsonl_data(data_path: str, print_summary: bool = True, save_path: st
             processed_data["person"].append(processed_dict)
     # print summary if flag is on
     if print_summary:
-        _print_data_processing_summary(processed_data=processed_data)
+        _print_data_processing_summary(processed_data=processed_data, data_name="data_2")
     # save json if path is passed
     if save_path:
         write_json(json_data=processed_data, json_save_path=save_path)
@@ -317,20 +318,3 @@ if __name__ == "__main__":
     # process jsonl data (data_2)
     save_data_path = os.path.join(cfg.PROCESSESED_DATA_SAVE_DIR, cfg.PROCESSESED_DATA_2_NAME)
     data_2 = process_jsonl_data(data_path=data_path_2, save_path=save_data_path)
-    # merge data containing person tag
-    all_person_data = data_1["person"] + data_2["person"]
-    # merge data containing no person tag
-    all_no_person_data = data_1["no_person"] + data_2["no_person"]
-    all_data = all_person_data + all_no_person_data
-    from preprocessing.train_data_processing import convert_spacy_binary, split_data
-    train_person, valid_person, test_person = split_data(all_person_data)
-    train_no_person, valid_no_person, test_no_person = split_data(all_no_person_data)
-    train, valid, test = train_person+train_no_person, valid_person+valid_no_person, test_person+test_no_person
-    
-    write_json(test, json_save_path="dataset/final_test_data.json")
-    save_data_path = os.path.join(cfg.BINARY_DATA_DIR, cfg.TAIN_DATA_NAME)
-    convert_spacy_binary(train, save_data_path)
-    save_data_path = os.path.join(cfg.BINARY_DATA_DIR, cfg.VALID_DATA_NAME)
-    convert_spacy_binary(valid, save_data_path)
-    save_data_path = os.path.join(cfg.BINARY_DATA_DIR, cfg.TEST_DATA_NAME)
-    convert_spacy_binary(test, save_data_path)
