@@ -1,4 +1,5 @@
 scikit-learn
-spacy
-spacy-transformers
+spacy==3.5.4
+spacy-transformers==1.2.5
 gdown
+gradio

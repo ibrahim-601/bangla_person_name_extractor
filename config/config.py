@@ -33,4 +33,4 @@ TEST_PERCENTAGE = 0.50 # 50% of test+validation data, which is 10% of total data
 # model directory
 MODEL_DIR = os.path.join(_module_path,"models/model-best")
 # public url of model
-MODEL_URL = "https://drive.google.com/drive/folders/1ZpCcXqqYpOnuasPmK6zYgMJM_iJICoWt"
+MODEL_URL = "https://drive.google.com/drive/folders/1zJfAVSItJVkHt-ttGgB383VrXeBasAHX"

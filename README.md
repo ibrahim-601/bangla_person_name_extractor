@@ -31,25 +31,21 @@ Now we need to convert both the data into similar format. Data_1 is tokenized, b
 ```py
 [
     {
-        "tokens": ["ইব্রাহীম", "ভালো", "কোডিং", "পারে", "।"],
-        "tags": ["B-PER", "O", "O", "O", "O"],
+        "tokens": ["ইব্রাহীম", "ভালো", "কোডিং", "পারে", "না","।"],
+        "tags": ["B-PER", "O", "O", "O", "O", "O"],
     },
 ]
 ```
 
-```
 N.B. (1): We found that some words in data_1 has no tag tag for it, so we will remove those tokens. Also some sentence have extra tags, we will remove those also. There are many more issues in the data i.e. there is a person name but it is tagged as `O`, same person name is tagged as `PERSON` in some sentence and tagged as `O` in other sentence, etc. We will ignore these as we have limited time for the submission.
-```
+
 
 After this we will convert `IOB` notation into `BILUO` notation and we will also remove all NER tags other than `Person` tags. We will changes all `x-PERSON` tag to `x-PER` tag for consistancy across data.
 
-```
-N.B. (2): After removing other tags than `Person` we have some sentences with `Person` and some sentences with `O` tags only (which actually means no tag). To prevent skewness is data we will make train, test, validation sets from those two categories seperately.
-```
 
-```
+N.B. (2): After removing other tags than `Person` we have some sentences with `Person` and some sentences with `O` tags only (which actually means no tag). To prevent skewness is data we will make train, test, validation sets from those two categories seperately.
+
 N.B. (3): The tokenizer we created from bert tokenizer treat all punctuations as token. Which leads to converting `মো.` --> `মো` and `.`, `ডা.` --> `ডা` and `.`, `৯.৭` --> `৯` and `.` and `৭`, `কো-অপারেটিভ` --> `কো` and `-` and `অপারেটিভ`, etc. This results into inconsistency in token lengths and tag lengths. We will modify the tokenizer to not tokenize on `.` character. But data_1 has `.` as a seperate token and `-` not seperated i.e. `মো.` --> `মো` and `.`, and `কো-অপারেটিভ` --> `কো-অপারেটিভ`. We will modify the processing steps for data_1 so that these cases match on both datasets. We will merge `মো` and `.` --> `মো.`, and split `কো-অপারেটিভ` --> `কো` and `-` and `অপারেটিভ` on data_1. We will also modify the tags accordingly.
-```
 
 With above processing we were able to retieve data with below numbers.
 ```
@@ -135,9 +131,25 @@ Step 5: Now we will evaluate the model on `test` data. We will use `model-best` 
 ```bash
 python -m spacy benchmark accuracy models/model-best dataset/test.spacy --gpu-id 0
 ```
+Below is the evaluation result from last model
+```bash
+================================== Results ==================================
+
+TOK     -    
+NER P   80.40
+NER R   84.15
+NER F   82.23
+SPEED   3140 
+
+
+=============================== NER (per type) ===============================
+
+          P       R       F
+PER   80.40   84.15   82.23
+```
 
 # Prediction on User Input
-To take predictions on user input we can use the [bangla_person_name_extractor.py](./bangla_person_name_extractor.py) script. But first we need a model for this task. We can either [train](#model-training-and-evaluation) a new model and use that, or we can use a pretrained model. If we want to use pretrained model then we would want to download it first. We can download by running below command. It will download a model trained for this project from [google drive](https://drive.google.com/drive/folders/1ZpCcXqqYpOnuasPmK6zYgMJM_iJICoWt?usp=drive_link).
+To take predictions on user input we can use the [bangla_person_name_extractor.py](./bangla_person_name_extractor.py) script. But first we need a model for this task. We can either [train](#model-training-and-evaluation) a new model and use that, or we can use a pretrained model. If we want to use pretrained model then we would want to download it first. We can download by running below command. It will download a model trained for this project from [google drive](https://drive.google.com/drive/folders/1zJfAVSItJVkHt-ttGgB383VrXeBasAHX?usp=drive_link).
 ```bash
 python -m utils.downloader
 ```
@@ -148,13 +160,26 @@ python -m bangla_person_name_extractor -i "মো. আলমের কাছ থ
 ```
 2. Using below bash command and passing the text as argument and a ouput json path, it will write the output in the json file path passed as argument.
 ```bash
-python -m bangla_person_name_extractor -i "মো. আলমের কাছ থেকে ১৫ লাখ টাকা আদায় করা হয়।"
+python -m bangla_person_name_extractor -i "মো. আলমের কাছ থেকে ১৫ লাখ টাকা আদায় করা হয়।" -o out.json
 ```
 3. Importing the file in another python script
 ```python
-from bangla_person_name_extractor import extract_person_name
+from bangla_person_name_extractor import BanglaPersorNer
 
+# create an object of BanglaPersorNer
+bp_ner = BanglaPersorNer()
+# text to extract person name from
 text = "মো. আলমের কাছ থেকে ১৫ লাখ টাকা আদায় করা হয়।"
-res =  extract_person_name(text)
+# extract person names
+res =  bp_ner.extract_person_name(text)
+# print the result
 print(res)
 ```
+4. If none of the above feels nice then you can use the gradio interface. To use gradio interface run below command
+```bash
+python app.py
+```
+Now, open browser and go to http://127.0.0.1:7860/. It will open a page like below image. 
+![gradio interface blank](./images/gradio_blank.png)
+You can write your text on the left text box, then press submit and you will be able to see output on the right text box.
+![gradio interface result](./images/gradio_result.png)

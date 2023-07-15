@@ -7,10 +7,14 @@ dependencies:
   - cudatoolkit=11.3.1
   - cudnn=8.2.1
   - cupy=9.2.0
-  - spacy=3.5.4
-  - spacy-transformers
   - pip=23.1.2
   - python=3.8.17
   - scikit-learn=1.2.2
   - pip:
     - gdown==4.7.1
+    - gradio==3.36.1
+    - huggingface-hub==0.16.4
+    - spacy==3.5.4
+    - spacy-transformers==1.2.5
+    - torch==2.0.1
+    - transformers==4.30.2
