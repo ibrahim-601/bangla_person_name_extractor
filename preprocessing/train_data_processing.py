@@ -17,9 +17,9 @@ def _split_train_val_test(data: list) -> tuple:
     # split into train data and test+validation data
     train_data, test_val_data = train_test_split(data, test_size=cfg.TEST_VAL_PERCENTAGE)
     # split into validation data and test data
-    val_val, test_data = train_test_split(test_val_data, test_size=cfg.TEST_PERCENTAGE)
+    test_data, val_data = train_test_split(test_val_data, test_size=cfg.TEST_PERCENTAGE)
     # return train, validation, and test data as tuple
-    return (train_data, val_val, test_data)
+    return (train_data, val_data, test_data)
 
 def _convert_save_spacy_binary(data: list, save_path: str):
     """This function converts our custom data into spacy binary format.
@@ -109,3 +109,12 @@ def split_and_convert_data(data: list):
     print("Saved train data at : ", cfg.TEST_DATA_PATH)
     # print stats of training data
     
+if __name__ == "__main__":
+    import json
+    # process text data (data_1)
+    processed_data_1_path = os.path.join(cfg.PROCESSESED_DATA_SAVE_DIR, cfg.PROCESSESED_DATA_1_NAME)
+    data_1 = json.load(open(processed_data_1_path, encoding="utf-8"))
+    # process jsonl data (data_2)
+    processed_data_2_path = os.path.join(cfg.PROCESSESED_DATA_SAVE_DIR, cfg.PROCESSESED_DATA_2_NAME)
+    data_2 = json.load(open(processed_data_2_path, encoding="utf-8"))
+    split_and_convert_data(data=(data_1,data_2))

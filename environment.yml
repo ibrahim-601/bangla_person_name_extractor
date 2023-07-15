@@ -1,0 +1,16 @@
+name: spacy_ner
+channels:
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - cudatoolkit=11.3.1
+  - cudnn=8.2.1
+  - cupy=9.2.0
+  - spacy=3.5.4
+  - spacy-transformers
+  - pip=23.1.2
+  - python=3.8.17
+  - scikit-learn=1.2.2
+  - pip:
+    - gdown==4.7.1

@@ -1,4 +1,5 @@
 import argparse
+import json
 import spacy
 from config import config as cfg
 
@@ -53,15 +54,26 @@ def extract_person_name(text: str) -> dict:
     # return the result
     return result
 
-if __name__ == "__main__":
-    # define list of sentences
-    texts = [
-        "এ ট্যাবলেটটির নাম হতে পারে 'আইপ্যাড ম্যাক্সি'।",
-        "মো. আলমের কাছ থেকে ১৫ লাখ টাকা আদায় করা হয়।",
-        "এতিমখানার কর্মকর্তা-শিক্ষার্থীরা কমিটি ও চুক্তির বিরুদ্ধে আন্দোলন শুরু করে।",
-        "ডা. মো. শরিফুল ইসলাম, শহীদ সোহরাওয়ার্দী মেডিকেল, কলেজ ও হাসপাতাল।"
-    ]
-    # take prediction for every sentence and print the results
-    for text in texts:
-        res = extract_person_name(text)
+def main():
+    # create argument parser
+    parser = argparse.ArgumentParser(description='Predict bangla names in given text.')
+    # add argument for input to argrument parser
+    parser.add_argument(
+        '-i', '--input', required=True, type=str, help='input: bangla text to predict names.')
+    # add argument for output to argrument parser
+    parser.add_argument(
+        '-o', '--output', required=False, type=str, help='output json path: bangla text to predict names.')
+    # parse arguments
+    args = parser.parse_args()
+    # extract names from argument input
+    res = extract_person_name(args.input)
+    # if there is output argument then write the output to 
+    if args.output:
+        with open(args.output, "w", encoding="utf-8") as file:
+            file.write(json.dumps(res, ensure_ascii=False, indent=4))
+        print(f"Output saved to file : {args.output}")
+    else:
         print(res)
+
+if __name__ == "__main__":
+    main()

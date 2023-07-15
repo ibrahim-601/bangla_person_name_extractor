@@ -48,4 +48,5 @@ def download_model():
     gdown.download_folder(model_url, output=model_save_dir)
 
 if __name__ == "__main__":
+    # download pretrained model
     download_model()

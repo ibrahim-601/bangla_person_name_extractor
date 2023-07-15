@@ -8,7 +8,7 @@ from config import config as cfg
 
 tokenizer = BasicTokenizer()
 
-def write_json(json_data: json, json_save_path: str):
+def _write_json(json_data: json, json_save_path: str):
     """This function saves json data to given path.
 
     Args:
@@ -224,7 +224,7 @@ def process_text_data(data_path: str, print_summary: bool = True, save_path: str
         _print_data_processing_summary(processed_data=processed_data, data_name="data_1")
     # save json if path is passed
     if save_path:
-        write_json(json_data=processed_data, json_save_path=save_path)
+        _write_json(json_data=processed_data, json_save_path=save_path)
     # return processed data
     return processed_data
 
@@ -302,7 +302,7 @@ def process_jsonl_data(data_path: str, print_summary: bool = True, save_path: st
         _print_data_processing_summary(processed_data=processed_data, data_name="data_2")
     # save json if path is passed
     if save_path:
-        write_json(json_data=processed_data, json_save_path=save_path)
+        _write_json(json_data=processed_data, json_save_path=save_path)
     # return processed data
     return processed_data
 
