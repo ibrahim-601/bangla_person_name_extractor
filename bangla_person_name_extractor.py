@@ -96,7 +96,7 @@ def main() -> None:
     # if there is output argument then write the output to 
     if args.output:
         # create directories if does not exists
-        os.makedirs(os.path.dirname(args.output)[0], exist_ok=True)
+        os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
         # open and write to file
         with open(args.output, "w", encoding="utf-8") as file:
             file.write(json.dumps(res, ensure_ascii=False, indent=4))

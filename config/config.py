@@ -3,21 +3,20 @@ import os
 # get absolute path of bangla person name extractor module
 _module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-# tags we want to keep. tags not listed here will be removed
-TAGS_TO_KEEP = []
+# tags we want to keep. tags not listed here will be removed.
+# Always write tags here in uppercase letters. Do not include "O" tag.
+TAGS_TO_KEEP = ["B-PER", "I-PER", "B-PERSON", "I-PERSON", "L-PERSON", "U-PERSON"]
 
 # punctuation to not tokenize. punctuation listed here will not be tokenized seperately
 SKIP_PUNC = [".",]
 
 # raw data related directory and file names
-RAW_DATA_DOWNLOAD_DIR = os.path.join(_module_path,"data_raw")
-RAW_DATA_1_FILE_NAME = "data_1_raw.txt"
-RAW_DATA_2_FILE_NAME = "data_2_raw.jsonl"
+RAW_DATA1_FILE_PATH = os.path.join(_module_path,"dataset/data1_raw.txt")
+RAW_DATA2_FILE_PATH = os.path.join(_module_path,"dataset/data2_raw.jsonl")
 
 # processesed data related directory and file names
-PROCESSESED_DATA_SAVE_DIR = os.path.join(_module_path,"data_processesed")
-PROCESSESED_DATA_1_NAME = "data_1.json"
-PROCESSESED_DATA_2_NAME = "data_2.json"
+PROCESSESED_DATA1_PATH = os.path.join(_module_path,"dataset/data1_processed.json")
+PROCESSESED_DATA2_PATH = os.path.join(_module_path,"dataset/data2_processed.json")
 
 # final training, validation data paths
 TRAIN_DATA_PATH = os.path.join(_module_path,"dataset/train.spacy")

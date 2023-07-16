@@ -97,7 +97,7 @@ def split_and_convert_data(data: list):
     # print stats of total training data
     _print_data_processing_summary("All data", len(train), len(valid), len(test))
     # save data to binary format
-    print("Saving spacy binary format data...")
+    print("\nSaving spacy binary format data...")
     # save train data in spacy binary format
     _convert_save_spacy_binary(train, cfg.TRAIN_DATA_PATH)
     print("Saved train data at : ", cfg.TRAIN_DATA_PATH)
@@ -112,9 +112,7 @@ def split_and_convert_data(data: list):
 if __name__ == "__main__":
     import json
     # process text data (data_1)
-    processed_data_1_path = os.path.join(cfg.PROCESSESED_DATA_SAVE_DIR, cfg.PROCESSESED_DATA_1_NAME)
-    data_1 = json.load(open(processed_data_1_path, encoding="utf-8"))
+    data_1 = json.load(open(cfg.PROCESSESED_DATA1_PATH, encoding="utf-8"))
     # process jsonl data (data_2)
-    processed_data_2_path = os.path.join(cfg.PROCESSESED_DATA_SAVE_DIR, cfg.PROCESSESED_DATA_2_NAME)
-    data_2 = json.load(open(processed_data_2_path, encoding="utf-8"))
+    data_2 = json.load(open(cfg.PROCESSESED_DATA2_PATH, encoding="utf-8"))
     split_and_convert_data(data=(data_1,data_2))

@@ -6,6 +6,7 @@ from utils.downloader import download_data
 from utils.tokenizer import BasicTokenizer
 from config import config as cfg
 
+# initialize a tokenizer object
 tokenizer = BasicTokenizer()
 
 def _write_json(json_data: json, json_save_path: str):
@@ -36,12 +37,12 @@ def _remove_unwanted_tags(tags: list) -> list:
     # iterate over each tag
     for tag in tags:
         # if tag does not contain "PER" then add "O" for that tag
-        if "per" not in tag.lower():
+        if tag.upper() not in cfg.TAGS_TO_KEEP:
             updated_tags.append("O")
         # otherwise add the tag into updated tags
         else:
-            # replace PERSON with PER in the tag so that tag is similar in both dataset
-            tag = tag.replace("PERSON","PER")
+            # replace PER with PERSON in the tag so that tag is similar in both dataset
+            tag = re.sub(r"PER$", "PERSON", tag, flags=re.IGNORECASE)
             updated_tags.append(tag)
     # return the updated tags
     return updated_tags
@@ -308,13 +309,11 @@ def process_jsonl_data(data_path: str, print_summary: bool = True, save_path: st
 
 if __name__ == "__main__":
     # download the dataset provided for the project if it does not exist
-    data_path_1 = os.path.join(cfg.RAW_DATA_DOWNLOAD_DIR, cfg.RAW_DATA_1_FILE_NAME)
-    data_path_2 = os.path.join(cfg.RAW_DATA_DOWNLOAD_DIR, cfg.RAW_DATA_2_FILE_NAME)
+    data_path_1 = cfg.RAW_DATA1_FILE_PATH
+    data_path_2 = cfg.RAW_DATA2_FILE_PATH
     if not os.path.exists(data_path_1) or not os.path.exists(data_path_2):
         download_data()
     # process text data (data_1)
-    save_data_path = os.path.join(cfg.PROCESSESED_DATA_SAVE_DIR, cfg.PROCESSESED_DATA_1_NAME)
-    data_1 = process_text_data(data_path=data_path_1, save_path=save_data_path)
+    data_1 = process_text_data(data_path=data_path_1, save_path=cfg.PROCESSESED_DATA1_PATH)
     # process jsonl data (data_2)
-    save_data_path = os.path.join(cfg.PROCESSESED_DATA_SAVE_DIR, cfg.PROCESSESED_DATA_2_NAME)
-    data_2 = process_jsonl_data(data_path=data_path_2, save_path=save_data_path)
+    data_2 = process_jsonl_data(data_path=data_path_2, save_path=cfg.PROCESSESED_DATA2_PATH)
