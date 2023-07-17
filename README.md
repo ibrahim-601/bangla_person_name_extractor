@@ -25,7 +25,7 @@ After looking through the data it is found that data_1 is in `IOB` notation and 
 
 ## Preprocessing
 ### Step 1:
-To process the data, we first need to download them. A [function](bangla_person_ner/preprocessing/raw_data_processing.py#L4) was written to save two dataset in two seperate files.
+To process the data, we first need to download them. A [function](./bangla_person_ner/utils/downloader.py#L6) was written to save two dataset in two seperate files.
 ### Step 2:
 Now we need to convert both the data into similar format. Data_1 is tokenized, but Data_2 is not. We will need a tokenizer for tokenizing data_2. We will modify [bert tokenizer](https://github.com/google-research/bert/blob/master/tokenization.py). We will convert both data into below format for processing further.
 ```py
@@ -95,7 +95,7 @@ This will start the training and save the weights in `models` directory. Spacy s
 
 Step 5: Now we will evaluate the model on `test` data. We will use `model-best` for evaluaion. To evaluate below command is used.
 ```bash
-python -m spacy benchmark accuracy bangla_person_ner/models/model-best dataset/test.spacy --gpu-id 0
+python -m spacy benchmark accuracy bangla_person_ner/models/model-best bangla_person_ner/dataset/test.spacy --gpu-id 0
 ```
 Below is the evaluation result from last model
 ![eval result](./images/eval.png)
