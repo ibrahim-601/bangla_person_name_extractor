@@ -1,5 +1,5 @@
 # Bangla Persosn-Name Extractor
-This repository contains code for extracting `person-name` form bangla text.
+This repository contains code for extracting `person-name` form bangla text. All code and commands are tested on `Ubuntu 20.04` machine, but should also work on `Windows 10` machines.
 
 # Environment Setup
 We have used anaconda to setup environment. If you are using anaconda then you can setup a virtual environment using the `environment.yml` file provided. To do so run below command in the project directory
@@ -25,7 +25,7 @@ After looking through the data it is found that data_1 is in `IOB` notation and 
 
 ## Preprocessing
 ### Step 1:
-To process the data, we first need to download them. A [function](./data_processing.py#L4) was written to save two dataset in two seperate files.
+To process the data, we first need to download them. A [function](bangla_person_ner/preprocessing/raw_data_processing.py#L4) was written to save two dataset in two seperate files.
 ### Step 2:
 Now we need to convert both the data into similar format. Data_1 is tokenized, but Data_2 is not. We will need a tokenizer for tokenizing data_2. We will modify [bert tokenizer](https://github.com/google-research/bert/blob/master/tokenization.py). We will convert both data into below format for processing further.
 ```py
@@ -61,23 +61,23 @@ We will fine-tune [BERT model](https://huggingface.co/csebuetnlp/banglabert) fro
 
 Step 1: At first we want to download and process data. For this you can run below command in the project directory on a environment activated terminal.
 ```bash
-python -m preprocessing.raw_data_processing
+python -m bangla_person_ner.preprocessing.raw_data_processing
 ```
 This will download both the dataset and then clean them and store them in previously mentioned format.
 
 Step 2: Then we want to split the data into train, validation, and test sets and convert them into Spacy binary format. To do this run the following command.
 ```bash
-python -m preprocessing.train_data_processing
+python -m bangla_person_ner.preprocessing.train_data_processing
 ```
 This will read the processed data in previous step and then split both data into train, validation, and test set for data that contains `PERSON` tag and data that does not contain `PERSON` tag seperately. After spliting it will merge similar splits i.e. train, test etc of data with `PERSON` tag and without `PERSON` tag. Finally it will store the data in Spacy binary format.
 
-N.B. All the paths and directories are defined in [config.py](./config/config.py) file.
+N.B. All the paths and directories are defined in [config.py](bangla_person_ner/config/config.py) file.
 
 Step 3: Now, we will generate spacy training config. Run below command to generate the config file.
 ```bash
-python -m spacy init config config/spacy_config.cfg --lang bn --pipeline ner --optimize accuracy --gpu
+python -m spacy init config bangla_person_ner/config/spacy_config.cfg --lang bn --pipeline ner --optimize accuracy --gpu
 ```
-This will save the training config as `config.cfg` in [config](./config/) directory.
+This will save the training config as `config.cfg` in `config` directory.
 ![spacy config](./images/spacy_config.png)
 
 We need to modify the config. We will open it in any text editor and change the following
@@ -88,35 +88,35 @@ After the changes we will save the file.
 
 Step 4: At this step we will train the model. For training we use below command.
 ```bash
-python -m spacy train config/spacy_config.cfg --output models --gpu-id 0 --paths.train dataset/train.spacy --paths.dev dataset/valid.spacy
+python -m spacy train bangla_person_ner/config/spacy_config.cfg --output bangla_person_ner/models --gpu-id 0 --paths.train bangla_person_ner/dataset/train.spacy --paths.dev bangla_person_ner/dataset/valid.spacy
 ```
 This will start the training and save the weights in `models` directory. Spacy saves two models- `model-best` and `model-last`.
 ![training pipeline](./images/train_pipeline.png)
 
 Step 5: Now we will evaluate the model on `test` data. We will use `model-best` for evaluaion. To evaluate below command is used.
 ```bash
-python -m spacy benchmark accuracy models/model-best dataset/test.spacy --gpu-id 0
+python -m spacy benchmark accuracy bangla_person_ner/models/model-best dataset/test.spacy --gpu-id 0
 ```
 Below is the evaluation result from last model
 ![eval result](./images/eval.png)
 
 # Prediction on User Input
-To take predictions on user input we can use the [bangla_person_name_extractor.py](./bangla_person_name_extractor.py) script. But first we need a model for this task. We can either [train](#model-training-and-evaluation) a new model and use that, or we can use a pretrained model. If we want to use pretrained model then we would want to download it first. We can download by running below command. It will download a model trained for this project from [google drive](https://drive.google.com/drive/folders/1zJfAVSItJVkHt-ttGgB383VrXeBasAHX?usp=drive_link).
+To take predictions on user input we can use the [bangla_person_ner.py](bangla_person_ner/bangla_person_ner.py) script. But first we need a model for this task. We can either [train](#model-training-and-evaluation) a new model and use that, or we can use a pretrained model. If we want to use pretrained model then we would want to download it first. We can download by running below command. It will download a model trained for this project from [google drive](https://drive.google.com/drive/folders/1zJfAVSItJVkHt-ttGgB383VrXeBasAHX?usp=drive_link).
 ```bash
-python -m utils.downloader
+python -m bangla_person_ner.utils.downloader
 ```
 After training/downloading model we can take prediction with the model in following ways
 1. Using below bash command and passing the text as argument, it will print the ouutput in terminal.
 ```bash
-python -m bangla_person_name_extractor -i "মো. আলমের কাছ থেকে ১৫ লাখ টাকা আদায় করা হয়।"
+python -m bangla_person_ner.bangla_person_ner -i "মো. আলমের কাছ থেকে ১৫ লাখ টাকা আদায় করা হয়।"
 ```
 2. Using below bash command and passing the text as argument and a ouput json path, it will write the output in the json file path passed as argument.
 ```bash
-python -m bangla_person_name_extractor -i "মো. আলমের কাছ থেকে ১৫ লাখ টাকা আদায় করা হয়।" -o out.json
+python -m bangla_person_ner.bangla_person_ner -i "মো. আলমের কাছ থেকে ১৫ লাখ টাকা আদায় করা হয়।" -o out.json
 ```
 3. Importing the file in another python script
 ```python
-from bangla_person_name_extractor import BanglaPersorNer
+from bangla_person_ner.bangla_person_ner import BanglaPersorNer
 
 # create an object of BanglaPersorNer
 bp_ner = BanglaPersorNer()
@@ -127,12 +127,25 @@ res =  bp_ner.extract_person_name(text)
 # print the result
 print(res)
 ```
-4. If none of the above feels easy to use then you can use the gradio interface. To use gradio interface run below command
+4. If none of the above feels easy to use then you can use the gradio app. To use gradio app run below command
 ```bash
 python app.py
 ```
-Now, open browser and go to http://127.0.0.1:7860/. It will open a page like below image. 
+Now, open browser and go to http://0.0.0.0:8080/. It will open a page like below image. 
 ![gradio interface blank](./images/gradio_blank.png)
 You can write your text on the left text box, then press submit and you will be able to see output on the right text box.
 ![gradio interface result](./images/gradio_result.png)
 ![gradio interface no name](./images/gradio_result_no_name.png)
+
+5. You can also use docker to run gradio app. Check [Docker instructions](#gradio-app-using-docker).
+
+# Gradio App Using Docker
+To use docker image use the [Dockerfile](./Dockerfile) to create a docker image. Run below command to create a docker image.
+```bash
+docker build -t bangla_person_ner:gradio_app .
+```
+After the image is created you can run the app using following command
+```
+docker run -it -d --name bangla_person_ner --gpus all -p 8080:8080 bangla_person_ner:gradio_app
+```
+After running above command open any browser and go to http://0.0.0.0:8080/ and you will see the gradio interface.

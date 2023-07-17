@@ -2,7 +2,7 @@ import os
 import argparse
 import json
 import spacy
-from config import config as cfg
+from .config import config as cfg
 
 class BanglaPersorNer(object):
     """Class for Bangla person name extraction.

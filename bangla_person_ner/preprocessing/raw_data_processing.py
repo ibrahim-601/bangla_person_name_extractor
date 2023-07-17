@@ -2,9 +2,9 @@ import os
 import re
 import json
 from spacy.training.iob_utils import iob_to_biluo
-from utils.downloader import download_data 
-from utils.tokenizer import BasicTokenizer
-from config import config as cfg
+from ..utils.downloader import download_data 
+from ..utils.tokenizer import BasicTokenizer
+from ..config import config as cfg
 
 # initialize a tokenizer object
 tokenizer = BasicTokenizer()

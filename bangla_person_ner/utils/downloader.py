@@ -1,7 +1,7 @@
 import os
 import requests
 import gdown
-from config import config as cfg
+from ..config import config as cfg
 
 def download_data():
     """This function downloads dataset using the links provided in the test description.

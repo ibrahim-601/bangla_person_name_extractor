@@ -1,9 +1,16 @@
 import gradio as gr
-from utils.tokenizer import BasicTokenizer
-from bangla_person_name_extractor import BanglaPersorNer
+from bangla_person_ner.utils.tokenizer import BasicTokenizer
+from bangla_person_ner.bangla_person_ner import BanglaPersorNer
 
-# create an object of BanglaPersorNer
-bp_ner = BanglaPersorNer()
+# try to create an object of BanglaPersorNer
+try:
+    bp_ner = BanglaPersorNer()
+except:
+    # if model loading fails download it from google drive
+    from bangla_person_ner.utils import downloader
+    # create an object of BanglaPersorNer
+    downloader.download_model()
+    bp_ner = BanglaPersorNer()
 # create tokenizer object
 tokenizer = BasicTokenizer()
 
@@ -30,44 +37,48 @@ def handler(text: str) -> list:
     # return the tokens
     return ner_tokens
 
-# Description to be shown at top of gradio interface
-description = "This project lets you extract bangla person name from the provided text. To extract \
-    names type (or, copy paste) your text in the text box below at left side and press submit button. \
-    On the right side text box you will see your text with person name highlighted."
-# Articale to be shown after input output field of gradio interface
-article = "The model used in this project is fine-tuned from \
-    [BERT model](https://huggingface.co/csebuetnlp/banglabert) using \
-    [Rifat1493/Bengali-NER/annotated data](https://github.com/Rifat1493/Bengali-NER/tree/master/annotated%20data) and \
-    [banglakit/bengali-ner-data](https://raw.githubusercontent.com/banglakit/bengali-ner-data/master/main.jsonl) data."
-# color map for entities
-color_map = {"PER": "green"}
-# input field for gradio interface, a gradio textbox in our case
-inputs = gr.Textbox(placeholder="Enter sentence here...")
-# output field for gradio interface, gradio HighlightedText in our case
-# as we want to show extracted person name highlighted in the output.
-output = gr.HighlightedText(
-        color_map=color_map,
-        combine_adjacent=True,
-        adjacent_separator=" "
-    )
-# a list of input samples to be shown on gradio interface
-examples = [
-    "ডা. মো. শরিফুল ইসলাম, শহীদ সোহরাওয়ার্দী মেডিকেল, কলেজ ও হাসপাতাল।",
-    "মো. আলমের কাছ থেকে ১৫ লাখ টাকা আদায় করা হয়।",
-    "এতিমখানার কর্মকর্তা-শিক্ষার্থীরা কমিটি ও চুক্তির বিরুদ্ধে আন্দোলন শুরু করে।",
-]
-# initialize gradio interface.
-app = gr.Interface(
-    fn=handler,
-    inputs=inputs,
-    outputs=output,
-    examples=examples,
-    title="Bangla Person Name Extractor",
-    description=description,
-    article=article,
-    allow_flagging="never",
-    )
+def main() -> None:
+    """Main function to create and run gradio app
+    """
+    # Description to be shown at top of gradio interface
+    description = "This project lets you extract bangla person name from the provided text. To extract \
+        names type (or, copy paste) your text in the text box below at left side and press submit button. \
+        On the right side text box you will see your text with person name highlighted."
+    # Articale to be shown after input output field of gradio interface
+    article = "The model used in this project is fine-tuned from \
+        [BERT model](https://huggingface.co/csebuetnlp/banglabert) using \
+        [Rifat1493/Bengali-NER/annotated data](https://github.com/Rifat1493/Bengali-NER/tree/master/annotated%20data) and \
+        [banglakit/bengali-ner-data](https://raw.githubusercontent.com/banglakit/bengali-ner-data/master/main.jsonl) data."
+    # color map for entities
+    color_map = {"PER": "green"}
+    # input field for gradio interface, a gradio textbox in our case
+    inputs = gr.Textbox(placeholder="Enter sentence here...")
+    # output field for gradio interface, gradio HighlightedText in our case
+    # as we want to show extracted person name highlighted in the output.
+    output = gr.HighlightedText(
+            color_map=color_map,
+            combine_adjacent=True,
+            adjacent_separator=" "
+        )
+    # a list of input samples to be shown on gradio interface
+    examples = [
+        "ডা. মো. শরিফুল ইসলাম, শহীদ সোহরাওয়ার্দী মেডিকেল, কলেজ ও হাসপাতাল।",
+        "মো. আলমের কাছ থেকে ১৫ লাখ টাকা আদায় করা হয়।",
+        "এতিমখানার কর্মকর্তা-শিক্ষার্থীরা কমিটি ও চুক্তির বিরুদ্ধে আন্দোলন শুরু করে।",
+    ]
+    # initialize gradio interface.
+    app = gr.Interface(
+        fn=handler,
+        inputs=inputs,
+        outputs=output,
+        examples=examples,
+        title="Bangla Person Name Extractor",
+        description=description,
+        article=article,
+        allow_flagging="never",
+        )
+    # launch gradio app.
+    app.launch(server_name="0.0.0.0", server_port=8080)
 
 if __name__ == "__main__":
-    # launch gradio app.
-    app.launch()
+    main()

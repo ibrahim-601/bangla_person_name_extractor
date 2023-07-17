@@ -3,7 +3,7 @@ import spacy
 from spacy.tokens import DocBin, Doc, Span
 from spacy.training.iob_utils import tags_to_entities
 from sklearn.model_selection import train_test_split
-from config import config as cfg
+from ..config import config as cfg
 
 def _split_train_val_test(data: list) -> tuple:
     """This function takes data as a list and splits it into train, validation, and test set.

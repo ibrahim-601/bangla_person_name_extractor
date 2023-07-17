@@ -18,7 +18,7 @@
 
 import unicodedata
 import six
-from config import config as cfg
+from ..config import config as cfg
 
 # get punctuation to skip from config file
 SKIP_PUNC = cfg.SKIP_PUNC
